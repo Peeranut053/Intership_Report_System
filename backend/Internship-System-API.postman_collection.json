@@ -1,0 +1,826 @@
+{
+  "info": {
+    "_postman_id": "b6f2b8e0-6b7a-4b1a-9b0a-internship-auth-api",
+    "name": "Internship System - Auth API",
+    "description": "Test collection for the Node/Express + PostgreSQL backend: auth (register/login/me), the admin user-creation endpoint, public lookup data (majors/teachers/mentors), plus the validation, rate-limit, and role-escalation checks added during the security review.\n\nRun order: '0. Admin Setup' first (creates the teacher/mentor accounts a student registration needs to reference), then '1. Happy Path'.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000" },
+    { "key": "token", "value": "" },
+    { "key": "testEmail", "value": "test1@example.com" },
+    { "key": "testPassword", "value": "password123" },
+    { "key": "adminApiKey", "value": "dev_only_admin_key_change_me_9f3a7c2e1b" },
+    { "key": "testStudentCode", "value": "123456789012" },
+    { "key": "testMajorId", "value": "1" },
+    { "key": "testAdvisorTeacherId", "value": "" },
+    { "key": "testSupervisorTeacherId1", "value": "" },
+    { "key": "testSupervisorTeacherId2", "value": "" },
+    { "key": "testMentorId", "value": "" },
+    { "key": "resetToken", "value": "" },
+    { "key": "reportId", "value": "" },
+    { "key": "testProvinceId", "value": "20" },
+    { "key": "testSchoolDistrictId", "value": "" },
+    { "key": "testSubdistrictId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "0. Admin Setup (run first)",
+      "item": [
+        {
+          "name": "Create teacher1 (will be advisor)",
+          "event": [
+            { "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status is 201', function () { pm.response.to.have.status(201); });"] } }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-admin-key", "value": "{{adminApiKey}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"teacher1\",\n  \"email\": \"teacher1@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"teacher\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/admin/users", "host": ["{{baseUrl}}"], "path": ["api", "admin", "users"] }
+          }
+        },
+        {
+          "name": "Create teacher2 (will be supervisor 1)",
+          "event": [
+            { "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status is 201', function () { pm.response.to.have.status(201); });"] } }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-admin-key", "value": "{{adminApiKey}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"teacher2\",\n  \"email\": \"teacher2@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"teacher\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/admin/users", "host": ["{{baseUrl}}"], "path": ["api", "admin", "users"] }
+          }
+        },
+        {
+          "name": "Create teacher3 (will be supervisor 2)",
+          "event": [
+            { "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status is 201', function () { pm.response.to.have.status(201); });"] } }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-admin-key", "value": "{{adminApiKey}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"teacher3\",\n  \"email\": \"teacher3@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"teacher\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/admin/users", "host": ["{{baseUrl}}"], "path": ["api", "admin", "users"] }
+          }
+        },
+        {
+          "name": "Create mentor1",
+          "event": [
+            { "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status is 201', function () { pm.response.to.have.status(201); });"] } }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-admin-key", "value": "{{adminApiKey}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"mentor1\",\n  \"email\": \"mentor1@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"mentor\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/admin/users", "host": ["{{baseUrl}}"], "path": ["api", "admin", "users"] }
+          }
+        },
+        {
+          "name": "Get majors (check at least 1 exists)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('At least one major exists', function () {",
+                  "    pm.expect(json.majors.length).to.be.above(0);",
+                  "});",
+                  "if (json.majors && json.majors.length > 0) {",
+                  "    pm.collectionVariables.set('testMajorId', json.majors[0].major_id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/majors", "host": ["{{baseUrl}}"], "path": ["api", "majors"] }
+          },
+          "description": "database/internshipdb.sql does NOT seed the majors table. If this test fails with an empty list, insert at least one row first:\nINSERT INTO majors (major_name) VALUES ('Computer Science');"
+        },
+        {
+          "name": "Get teachers (capture advisor + 2 supervisors)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('At least 3 teachers exist', function () {",
+                  "    pm.expect(json.teachers.length).to.be.at.least(3);",
+                  "});",
+                  "const byName = (n) => (json.teachers || []).find((t) => t.teacher_name === n);",
+                  "const t1 = byName('teacher1');",
+                  "const t2 = byName('teacher2');",
+                  "const t3 = byName('teacher3');",
+                  "if (t1) pm.collectionVariables.set('testAdvisorTeacherId', t1.teacher_id);",
+                  "if (t2) pm.collectionVariables.set('testSupervisorTeacherId1', t2.teacher_id);",
+                  "if (t3) pm.collectionVariables.set('testSupervisorTeacherId2', t3.teacher_id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/teachers", "host": ["{{baseUrl}}"], "path": ["api", "teachers"] }
+          }
+        },
+        {
+          "name": "Get mentors (capture mentor)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('At least one mentor exists', function () {",
+                  "    pm.expect(json.mentors.length).to.be.above(0);",
+                  "});",
+                  "const m1 = (json.mentors || []).find((m) => m.mentor_name === 'mentor1');",
+                  "if (m1) pm.collectionVariables.set('testMentorId', m1.mentor_id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/mentors", "host": ["{{baseUrl}}"], "path": ["api", "mentors"] }
+          }
+        }
+      ],
+      "description": "Run every request in this folder top-to-bottom once (or use Collection Runner) before '1. Happy Path' — Register needs testAdvisorTeacherId/testSupervisorTeacherId1/testSupervisorTeacherId2/testMentorId/testMajorId to already point at real rows."
+    },
+    {
+      "name": "1. Happy Path",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/health", "host": ["{{baseUrl}}"], "path": ["api", "health"] }
+          }
+        },
+        {
+          "name": "Register (student)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', function () { pm.response.to.have.status(201); });",
+                  "if (pm.response.code === 201) {",
+                  "    const json = pm.response.json();",
+                  "    pm.collectionVariables.set('token', json.token);",
+                  "    pm.test('Role saved as student, not client-supplied value', function () {",
+                  "        pm.expect(json.user.role).to.eql('student');",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"testuser1\",\n  \"firstName\": \"ทดสอบ\",\n  \"lastName\": \"ระบบ\",\n  \"email\": \"{{testEmail}}\",\n  \"password\": \"{{testPassword}}\",\n  \"studentCode\": \"{{testStudentCode}}\",\n  \"majorId\": {{testMajorId}},\n  \"internshipPlace\": \"Acme Co., Ltd.\",\n  \"internshipStart\": \"2026-05-01\",\n  \"internshipEnd\": \"2026-08-31\",\n  \"mentorId\": {{testMentorId}},\n  \"advisorTeacherId\": {{testAdvisorTeacherId}},\n  \"supervisorTeacherIds\": [{{testSupervisorTeacherId1}}, {{testSupervisorTeacherId2}}]\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/auth/register", "host": ["{{baseUrl}}"], "path": ["api", "auth", "register"] }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    pm.collectionVariables.set('token', json.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"identifier\": \"{{testEmail}}\",\n  \"password\": \"{{testPassword}}\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] }
+          }
+        },
+        {
+          "name": "Me (authenticated)",
+          "event": [
+            { "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status is 200', function () { pm.response.to.have.status(200); });"] } }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/auth/me", "host": ["{{baseUrl}}"], "path": ["api", "auth", "me"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Validation & Security Checks",
+      "item": [
+        {
+          "name": "Register - role in body should be ignored (expect role: student)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Role is forced to student, not teacher', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.user.role).to.eql('student');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"wannabe_teacher\",\n  \"email\": \"escalate@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"teacher\",\n  \"studentCode\": \"111111111111\",\n  \"majorId\": {{testMajorId}},\n  \"internshipPlace\": \"Acme Co., Ltd.\",\n  \"internshipStart\": \"2026-05-01\",\n  \"internshipEnd\": \"2026-08-31\",\n  \"mentorId\": {{testMentorId}},\n  \"advisorTeacherId\": {{testAdvisorTeacherId}},\n  \"supervisorTeacherIds\": [{{testSupervisorTeacherId1}}, {{testSupervisorTeacherId2}}]\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/auth/register", "host": ["{{baseUrl}}"], "path": ["api", "auth", "register"] }
+          }
+        },
+        {
+          "name": "Register - invalid email format (expect 400)",
+          "event": [
+            { "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status is 400', function () { pm.response.to.have.status(400); });"] } }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"baduser\",\n  \"email\": \"not-an-email\",\n  \"password\": \"password123\",\n  \"studentCode\": \"222222222222\",\n  \"majorId\": {{testMajorId}},\n  \"internshipPlace\": \"Acme Co., Ltd.\",\n  \"internshipStart\": \"2026-05-01\",\n  \"internshipEnd\": \"2026-08-31\",\n  \"mentorId\": {{testMentorId}},\n  \"advisorTeacherId\": {{testAdvisorTeacherId}},\n  \"supervisorTeacherIds\": [{{testSupervisorTeacherId1}}, {{testSupervisorTeacherId2}}]\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/auth/register", "host": ["{{baseUrl}}"], "path": ["api", "auth", "register"] }
+          }
+        },
+        {
+          "name": "Register - password too short (expect 400)",
+          "event": [
+            { "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status is 400', function () { pm.response.to.have.status(400); });"] } }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"shortpwuser\",\n  \"email\": \"shortpw@example.com\",\n  \"password\": \"123\",\n  \"studentCode\": \"333333333333\",\n  \"majorId\": {{testMajorId}},\n  \"internshipPlace\": \"Acme Co., Ltd.\",\n  \"internshipStart\": \"2026-05-01\",\n  \"internshipEnd\": \"2026-08-31\",\n  \"mentorId\": {{testMentorId}},\n  \"advisorTeacherId\": {{testAdvisorTeacherId}},\n  \"supervisorTeacherIds\": [{{testSupervisorTeacherId1}}, {{testSupervisorTeacherId2}}]\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/auth/register", "host": ["{{baseUrl}}"], "path": ["api", "auth", "register"] }
+          }
+        },
+        {
+          "name": "Register - duplicate email (expect 409)",
+          "event": [
+            { "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status is 409', function () { pm.response.to.have.status(409); });"] } }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"someoneElse\",\n  \"email\": \"{{testEmail}}\",\n  \"password\": \"password123\",\n  \"studentCode\": \"444444444444\",\n  \"majorId\": {{testMajorId}},\n  \"internshipPlace\": \"Acme Co., Ltd.\",\n  \"internshipStart\": \"2026-05-01\",\n  \"internshipEnd\": \"2026-08-31\",\n  \"mentorId\": {{testMentorId}},\n  \"advisorTeacherId\": {{testAdvisorTeacherId}},\n  \"supervisorTeacherIds\": [{{testSupervisorTeacherId1}}, {{testSupervisorTeacherId2}}]\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/auth/register", "host": ["{{baseUrl}}"], "path": ["api", "auth", "register"] }
+          }
+        },
+        {
+          "name": "Register - same teacher used twice as supervisor (expect 400)",
+          "event": [
+            { "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status is 400', function () { pm.response.to.have.status(400); });"] } }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"dupesupervisor\",\n  \"email\": \"dupesupervisor@example.com\",\n  \"password\": \"password123\",\n  \"studentCode\": \"555555555555\",\n  \"majorId\": {{testMajorId}},\n  \"internshipPlace\": \"Acme Co., Ltd.\",\n  \"internshipStart\": \"2026-05-01\",\n  \"internshipEnd\": \"2026-08-31\",\n  \"mentorId\": {{testMentorId}},\n  \"advisorTeacherId\": {{testAdvisorTeacherId}},\n  \"supervisorTeacherIds\": [{{testSupervisorTeacherId1}}, {{testSupervisorTeacherId1}}]\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/auth/register", "host": ["{{baseUrl}}"], "path": ["api", "auth", "register"] }
+          }
+        },
+        {
+          "name": "Login - wrong password (expect 401)",
+          "event": [
+            { "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status is 401', function () { pm.response.to.have.status(401); });"] } }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"identifier\": \"{{testEmail}}\",\n  \"password\": \"wrongpassword\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] }
+          }
+        },
+        {
+          "name": "Me - no token (expect 401)",
+          "event": [
+            { "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status is 401', function () { pm.response.to.have.status(401); });"] } }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/auth/me", "host": ["{{baseUrl}}"], "path": ["api", "auth", "me"] }
+          }
+        },
+        {
+          "name": "Me - garbage token (expect 401)",
+          "event": [
+            { "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status is 401', function () { pm.response.to.have.status(401); });"] } }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer not.a.real.token" }],
+            "url": { "raw": "{{baseUrl}}/api/auth/me", "host": ["{{baseUrl}}"], "path": ["api", "auth", "me"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Rate Limit Check (login x12)",
+      "item": [
+        {
+          "name": "Login attempt (run this 12x via Collection Runner)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// On the 11th+ request within 15 minutes from the same IP,",
+                  "// this should return 429 instead of 401.",
+                  "console.log('Status:', pm.response.code);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"identifier\": \"{{testEmail}}\",\n  \"password\": \"wrongpassword\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] }
+          }
+        }
+      ],
+      "description": "Select this folder in Postman's Collection Runner and set Iterations = 12. Requests 1-10 should return 401 (wrong password), request 11+ should return 429 (rate limited)."
+    },
+    {
+      "name": "4. Admin API Security Checks",
+      "item": [
+        {
+          "name": "Create teacher without admin key (expect 401)",
+          "event": [
+            { "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status is 401', function () { pm.response.to.have.status(401); });"] } }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"sneaky\",\n  \"email\": \"sneaky@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"teacher\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/admin/users", "host": ["{{baseUrl}}"], "path": ["api", "admin", "users"] }
+          }
+        },
+        {
+          "name": "Create teacher with wrong admin key (expect 401)",
+          "event": [
+            { "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status is 401', function () { pm.response.to.have.status(401); });"] } }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-admin-key", "value": "totally-wrong-key" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"sneaky2\",\n  \"email\": \"sneaky2@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"teacher\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/admin/users", "host": ["{{baseUrl}}"], "path": ["api", "admin", "users"] }
+          }
+        },
+        {
+          "name": "Create student via admin without relations (expect 400)",
+          "event": [
+            { "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status is 400', function () { pm.response.to.have.status(400); });"] } }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-admin-key", "value": "{{adminApiKey}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"incompletestudent\",\n  \"email\": \"incompletestudent@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"student\",\n  \"studentCode\": \"888888888888\",\n  \"majorId\": {{testMajorId}},\n  \"internshipPlace\": \"Acme Co., Ltd.\",\n  \"internshipStart\": \"2026-05-01\",\n  \"internshipEnd\": \"2026-08-31\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/admin/users", "host": ["{{baseUrl}}"], "path": ["api", "admin", "users"] }
+          },
+          "description": "Omits mentorId/advisorTeacherId/supervisorTeacherIds on purpose — should be rejected the same way register() rejects it."
+        }
+      ],
+      "description": "adminApiKey must match ADMIN_API_KEY in backend/.env exactly for the positive cases in folder 0."
+    },
+    {
+      "name": "5. Forgot / Reset Password",
+      "item": [
+        {
+          "name": "Forgot password - existing account (expect 200, generic message)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Response is generic (does not confirm the account exists)', function () {",
+                  "    pm.expect(pm.response.json().success).to.eql(true);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"identifier\": \"{{testEmail}}\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/auth/forgot-password", "host": ["{{baseUrl}}"], "path": ["api", "auth", "forgot-password"] }
+          },
+          "description": "If SMTP_HOST/SMTP_USER/SMTP_PASS aren't set in backend/.env yet, the response still succeeds (by design — see authController.ts) but check the backend terminal log for a 'Failed to send password reset email' line. Check the password_reset_tokens table directly to get a real token for the next request while testing without SMTP configured:\nSELECT token_id, user_id, expires_at FROM password_reset_tokens ORDER BY token_id DESC LIMIT 1;\n(the raw token itself is never stored — only its hash — so you can't recover it from the DB; use a real inbox once SMTP is configured, or temporarily log rawToken in forgotPassword() for local testing only)."
+        },
+        {
+          "name": "Forgot password - nonexistent account (expect same generic message)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"identifier\": \"no-such-account@example.com\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/auth/forgot-password", "host": ["{{baseUrl}}"], "path": ["api", "auth", "forgot-password"] }
+          },
+          "description": "Compare this response byte-for-byte against the previous request — they must be identical, otherwise the endpoint leaks which accounts exist."
+        },
+        {
+          "name": "Reset password - invalid token (expect 400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "type": "text/javascript", "exec": ["pm.test('Status is 400', function () { pm.response.to.have.status(400); });"] }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"token\": \"not-a-real-token\",\n  \"newPassword\": \"newpassword123\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/auth/reset-password", "host": ["{{baseUrl}}"], "path": ["api", "auth", "reset-password"] }
+          }
+        },
+        {
+          "name": "Reset password - with real token from email (expect 200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "type": "text/javascript", "exec": ["pm.test('Status is 200', function () { pm.response.to.have.status(200); });"] }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"token\": \"{{resetToken}}\",\n  \"newPassword\": \"newpassword123\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/auth/reset-password", "host": ["{{baseUrl}}"], "path": ["api", "auth", "reset-password"] }
+          },
+          "description": "Paste the token from the emailed reset link (?token=...) into the collection variable 'resetToken' before running this — there's no way to script-capture it since it only ever exists in the email."
+        }
+      ],
+      "description": "Requires SMTP_HOST/SMTP_USER/SMTP_PASS set in backend/.env to actually receive the email; forgot-password itself always responds successfully either way."
+    },
+    {
+      "name": "6. Daily Reports (student)",
+      "item": [
+        {
+          "name": "Get my profile (for report page header)",
+          "event": [
+            { "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status is 200', function () { pm.response.to.have.status(200); });"] } }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/students/me", "host": ["{{baseUrl}}"], "path": ["api", "students", "me"] }
+          },
+          "description": "Uses the 'token' collection variable — run '1. Happy Path > Login' (as a student) first so it's populated."
+        },
+        {
+          "name": "Create today's report (expect 201)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', function () { pm.response.to.have.status(201); });",
+                  "if (pm.response.code === 201) {",
+                  "    pm.collectionVariables.set('reportId', pm.response.json().report.report_id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reportDate\": \"2026-09-06\",\n  \"workDescription\": \"ทดสอบเขียนรายงานประจำวัน\",\n  \"companyLocation\": \"123 ถ.จิระ\",\n  \"workPlace\": \"แผนก IT\",\n  \"supervisorName\": \"คุณสมชาย\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/reports", "host": ["{{baseUrl}}"], "path": ["api", "reports"] }
+          }
+        },
+        {
+          "name": "Create duplicate date (expect 409)",
+          "event": [
+            { "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status is 409', function () { pm.response.to.have.status(409); });"] } }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reportDate\": \"2026-09-06\",\n  \"workDescription\": \"ซ้ำวันเดิม\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/reports", "host": ["{{baseUrl}}"], "path": ["api", "reports"] }
+          },
+          "description": "daily_reports has a UNIQUE(student_id, report_date) constraint — one entry per day."
+        },
+        {
+          "name": "List my reports (expect 200)",
+          "event": [
+            { "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status is 200', function () { pm.response.to.have.status(200); });"] } }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/reports", "host": ["{{baseUrl}}"], "path": ["api", "reports"] }
+          }
+        },
+        {
+          "name": "Update report (expect 200)",
+          "event": [
+            { "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status is 200', function () { pm.response.to.have.status(200); });"] } }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reportDate\": \"2026-09-06\",\n  \"workDescription\": \"แก้ไขรายละเอียดงานแล้ว\",\n  \"companyLocation\": \"123 ถ.จิระ\",\n  \"workPlace\": \"แผนก IT\",\n  \"supervisorName\": \"คุณสมชาย\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/reports/{{reportId}}", "host": ["{{baseUrl}}"], "path": ["api", "reports", "{{reportId}}"] }
+          }
+        },
+        {
+          "name": "Delete report (expect 200)",
+          "event": [
+            { "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status is 200', function () { pm.response.to.have.status(200); });"] } }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/reports/{{reportId}}", "host": ["{{baseUrl}}"], "path": ["api", "reports", "{{reportId}}"] }
+          }
+        },
+        {
+          "name": "List reports - no token (expect 401)",
+          "event": [
+            { "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status is 401', function () { pm.response.to.have.status(401); });"] } }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/reports", "host": ["{{baseUrl}}"], "path": ["api", "reports"] }
+          }
+        }
+      ],
+      "description": "All of these need the 'token' collection variable set to a STUDENT's login token (run '1. Happy Path > Register' or 'Login' first)."
+    },
+    {
+      "name": "7. Student Profile (student)",
+      "item": [
+        {
+          "name": "List religions (public)",
+          "event": [
+            { "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status is 200', function () { pm.response.to.have.status(200); });"] } }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/religions", "host": ["{{baseUrl}}"], "path": ["api", "religions"] }
+          }
+        },
+        {
+          "name": "List provinces (public)",
+          "event": [
+            { "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status is 200', function () { pm.response.to.have.status(200); });"] } }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/provinces", "host": ["{{baseUrl}}"], "path": ["api", "provinces"] }
+          }
+        },
+        {
+          "name": "List districts by province (public, captures testSchoolDistrictId)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "const districts = pm.response.json().districts;",
+                  "if (Array.isArray(districts) && districts.length > 0) {",
+                  "    pm.collectionVariables.set('testSchoolDistrictId', districts[0].district_id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/districts?provinceId={{testProvinceId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "districts"],
+              "query": [{ "key": "provinceId", "value": "{{testProvinceId}}" }]
+            }
+          },
+          "description": "testProvinceId defaults to 20 (บุรีรัมย์). Captures the first district into 'testSchoolDistrictId' for the update-info request below."
+        },
+        {
+          "name": "List subdistricts by district (public, captures testSubdistrictId)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "const subdistricts = pm.response.json().subdistricts;",
+                  "if (Array.isArray(subdistricts) && subdistricts.length > 0) {",
+                  "    pm.collectionVariables.set('testSubdistrictId', subdistricts[0].subdistrict_id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/subdistricts?districtId={{testSchoolDistrictId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "subdistricts"],
+              "query": [{ "key": "districtId", "value": "{{testSchoolDistrictId}}" }]
+            }
+          },
+          "description": "Run 'List districts by province' first so testSchoolDistrictId is populated. Captures the first subdistrict into 'testSubdistrictId' for the update-info request's address fields below."
+        },
+        {
+          "name": "Get my profile (expect 200, includes editable fields)",
+          "event": [
+            { "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status is 200', function () { pm.response.to.have.status(200); });"] } }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/students/me", "host": ["{{baseUrl}}"], "path": ["api", "students", "me"] }
+          }
+        },
+        {
+          "name": "Update my profile - code/name/internship/personnel (expect 200)",
+          "event": [
+            { "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status is 200', function () { pm.response.to.have.status(200); });"] } }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentCode\": \"{{testStudentCode}}\",\n  \"firstName\": \"ทดสอบ\",\n  \"lastName\": \"ระบบ\",\n  \"internshipPlace\": \"Acme Co., Ltd.\",\n  \"internshipStart\": \"2026-05-01\",\n  \"internshipEnd\": \"2026-08-31\",\n  \"mentorId\": {{testMentorId}},\n  \"advisorTeacherId\": {{testAdvisorTeacherId}},\n  \"supervisorTeacherIds\": [{{testSupervisorTeacherId1}}, {{testSupervisorTeacherId2}}]\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/students/me", "host": ["{{baseUrl}}"], "path": ["api", "students", "me"] }
+          },
+          "description": "Replaces student_code/first_name/last_name/internship fields plus the advisor/2 supervisors/mentor assignment (deletes and re-inserts student_teachers/student_mentors rows). Run '0. Admin Setup' first so the testXxxId variables are populated."
+        },
+        {
+          "name": "Update my info (expect 200)",
+          "event": [
+            { "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status is 200', function () { pm.response.to.have.status(200); });"] } }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"birthDate\": \"2004-09-20\",\n  \"religionId\": 1,\n  \"phoneMobile\": \"0812345678\",\n  \"fatherName\": \"สมชาย ใจดี\",\n  \"fatherJob\": \"ค้าขาย\",\n  \"motherName\": \"สมหญิง ใจดี\",\n  \"motherJob\": \"รับราชการ\",\n  \"pastEducation\": \"มัธยมศึกษาตอนปลาย\",\n  \"pastSchool\": \"บุรีรัมย์พิทยาคม\",\n  \"schoolDistrictId\": {{testSchoolDistrictId}},\n  \"specialSkill\": \"เขียนโปรแกรม\",\n  \"specialInterest\": \"AI/Machine Learning\",\n  \"permanentHouseNum\": \"123\",\n  \"permanentRoad\": \"ถ.จิระ\",\n  \"permanentSubdistrictId\": {{testSubdistrictId}},\n  \"currentHouseNum\": \"456\",\n  \"currentRoad\": \"ถ.นิวาศ\",\n  \"currentSubdistrictId\": {{testSubdistrictId}}\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/students/me/info", "host": ["{{baseUrl}}"], "path": ["api", "students", "me", "info"] }
+          },
+          "description": "Run 'List districts by province' then 'List subdistricts by district' first so testSchoolDistrictId/testSubdistrictId are populated. Re-running this request updates (upserts) the same rows."
+        },
+        {
+          "name": "Update my info - missing birthDate (expect 400)",
+          "event": [
+            { "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status is 400', function () { pm.response.to.have.status(400); });"] } }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fatherName\": \"ทดสอบ\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/students/me/info", "host": ["{{baseUrl}}"], "path": ["api", "students", "me", "info"] }
+          }
+        },
+        {
+          "name": "Update my info - bad phone format (expect 400)",
+          "event": [
+            { "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status is 400', function () { pm.response.to.have.status(400); });"] } }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"birthDate\": \"2004-09-20\",\n  \"phoneMobile\": \"12345\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/students/me/info", "host": ["{{baseUrl}}"], "path": ["api", "students", "me", "info"] }
+          }
+        }
+      ],
+      "description": "Public lookup endpoints (religions/provinces/districts) plus the student profile GET/PUT added for the 'ข้อมูลนักศึกษา' page. Run '1. Happy Path > Login' (as a student) first so 'token' is populated."
+    }
+  ]
+}

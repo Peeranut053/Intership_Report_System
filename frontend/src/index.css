@@ -1,0 +1,1194 @@
+:root {
+  --text: #6b6375;
+  --text-h: #08060d;
+  --bg: #fff;
+  --border: #e5e4e7;
+  --code-bg: #f4f3ec;
+  --accent: #aa3bff;
+  --accent-bg: rgba(170, 59, 255, 0.1);
+  --accent-border: rgba(170, 59, 255, 0.5);
+  --social-bg: rgba(244, 243, 236, 0.5);
+  --shadow:
+    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+
+  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --mono: ui-monospace, Consolas, monospace;
+
+  font: 18px/145% var(--sans);
+  letter-spacing: 0.18px;
+  color-scheme: light;
+  color: var(--text);
+  background: var(--bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  @media (max-width: 1024px) {
+    font-size: 16px;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text: #9ca3af;
+    --text-h: #f3f4f6;
+    --bg: #16171d;
+    --border: #2e303a;
+    --code-bg: #1f2028;
+    --accent: #c084fc;
+    --accent-bg: rgba(192, 132, 252, 0.15);
+    --accent-border: rgba(192, 132, 252, 0.5);
+    --social-bg: rgba(47, 48, 58, 0.5);
+    --shadow:
+      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
+  }
+
+  #social .button-icon {
+    filter: invert(1) brightness(2);
+  }
+}
+
+#root {
+  width: 100%;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+/* ---- Global top bar ---------------------------------------------------- */
+
+.app-root {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 100svh;
+  width: 100%;
+}
+
+.app-topbar {
+  flex-shrink: 0;
+  background: #1c2b58;
+  color: #fff;
+  text-align: center;
+  font-weight: 700;
+  font-size: 24px;
+  letter-spacing: 0.3px;
+  padding: 22px 16px;
+}
+
+.app-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+body {
+  margin: 0;
+}
+
+h1,
+h2 {
+  font-family: var(--heading);
+  font-weight: 500;
+  color: var(--text-h);
+}
+
+h1 {
+  font-size: 56px;
+  letter-spacing: -1.68px;
+  margin: 32px 0;
+
+  @media (max-width: 1024px) {
+    font-size: 36px;
+    margin: 20px 0;
+  }
+}
+
+h2 {
+  font-size: 24px;
+  line-height: 118%;
+  letter-spacing: -0.24px;
+  margin: 0 0 8px;
+
+  @media (max-width: 1024px) {
+    font-size: 20px;
+  }
+}
+
+p {
+  margin: 0;
+}
+
+code,
+.counter {
+  font-family: var(--mono);
+  display: inline-flex;
+  border-radius: 4px;
+  color: var(--text-h);
+}
+
+code {
+  font-size: 15px;
+  line-height: 135%;
+  padding: 4px 8px;
+  background: var(--code-bg);
+}
+
+/* ---- App shell ------------------------------------------------------- */
+/* The auth screens intentionally use a fixed light palette (matching the
+   provided design) rather than the dark-mode-aware --text/--bg tokens
+   above — this is a branded login/register screen, not general app chrome. */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  background: #eef1f6;
+}
+
+.page-header {
+  padding: 0;
+}
+
+.page-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+}
+
+/* ---- Auth card (login/register/dashboard) ----------------------------- */
+
+.auth-shell {
+  width: 100%;
+  max-width: 480px;
+  text-align: left;
+  border-radius: 20px;
+  padding: 40px 36px;
+  background: #ffffff;
+  box-shadow: 0 20px 40px -12px rgba(30, 42, 80, 0.18);
+}
+
+.auth-shell--wide {
+  max-width: 720px;
+}
+
+.auth-title {
+  margin: 0 0 22px;
+  font-size: 24px;
+  line-height: 140%;
+  font-weight: 700;
+  text-align: center;
+  color: #1e3a68;
+}
+
+.auth-hint {
+  font-size: 17px;
+  color: #5b6472;
+  margin: 8px 0 0;
+}
+
+/* ---- Role tabs --------------------------------------------------------- */
+
+.role-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 20px;
+  background: #eef1f6;
+  border-radius: 12px;
+}
+
+.role-tab {
+  flex: 1;
+  padding: 13px 4px;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  color: #8892a6;
+  font: inherit;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.role-tab--active {
+  background: #ffffff;
+  color: #1e3a68;
+  box-shadow: 0 1px 4px rgba(30, 42, 80, 0.15);
+}
+
+/* ---- Form / fields ------------------------------------------------------ */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form--grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px 20px;
+}
+
+.form--grid .form-span {
+  grid-column: 1 / -1;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.field-label {
+  font-size: 17px;
+  font-weight: 600;
+  color: #3f4759;
+}
+
+.input-plain {
+  width: 100%;
+  box-sizing: border-box;
+  font: inherit;
+  font-size: 19px;
+  padding: 15px 17px;
+  border: none;
+  border-radius: 10px;
+  background: #eef1f6;
+  color: #1f2937;
+}
+
+.input-plain::placeholder {
+  color: #98a2b3;
+}
+
+.input-plain:focus {
+  outline: 2px solid #1e3a68;
+  outline-offset: 1px;
+}
+
+.input-plain:disabled {
+  background: #e2e5eb;
+  color: #55606f;
+  cursor: not-allowed;
+}
+
+.form-success {
+  color: #1e7a3c;
+  font-size: 16px;
+  margin: 0;
+}
+
+.section-title {
+  margin-top: 24px;
+}
+
+.input-with-icon {
+  position: relative;
+}
+
+.input-with-icon .input-plain {
+  padding-right: 44px;
+}
+
+.icon-button {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: #8892a6;
+  cursor: pointer;
+  padding: 4px;
+}
+
+/* Text-label variant (e.g. "แก้ไข"/"ลบ") rather than a single icon glyph —
+   overrides the larger icon font-size some contexts set. */
+.icon-button--text {
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: #eef1f6;
+  color: #47536b;
+}
+
+.icon-button--text:hover {
+  background: #e2e6ee;
+}
+
+/* ---- Buttons / links ----------------------------------------------------- */
+
+.btn-primary {
+  margin-top: 4px;
+  padding: 16px 20px;
+  border: none;
+  border-radius: 10px;
+  background: #1e3a68;
+  color: #fff;
+  font-weight: 700;
+  font-size: 19px;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background: #172c50;
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.form-error {
+  color: #d43a52;
+  font-size: 16px;
+  margin: 0;
+}
+
+.form-error--span {
+  grid-column: 1 / -1;
+}
+
+.switch-link {
+  margin-top: 18px;
+  font-size: 17px;
+  text-align: center;
+}
+
+.forgot-link {
+  margin: -4px 0 0;
+  font-size: 16px;
+  text-align: right;
+}
+
+.link-button {
+  background: none;
+  border: none;
+  color: #4c63a8;
+  cursor: pointer;
+  padding: 0;
+  font: inherit;
+  font-size: 16px;
+  text-decoration: none;
+}
+
+.link-button:hover {
+  text-decoration: underline;
+}
+
+/* ---- Student app shell (sidebar layout) --------------------------------- */
+
+.app-shell {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  background: #eef1f6;
+}
+
+.sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  background: #1c2b58;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 24px 0;
+}
+
+.sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 24px 20px;
+  margin: 0 12px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 0 12px;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: #b9c2de;
+  font: inherit;
+  font-size: 18px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sidebar-link:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+}
+
+.sidebar-link--active {
+  background: #2c3d78;
+  color: #fff;
+  font-weight: 600;
+}
+
+.sidebar-logout {
+  margin: 0 12px;
+  color: #ff9d9d;
+}
+
+.sidebar-logout:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffb3b3;
+}
+
+.app-content {
+  flex: 1;
+  padding: 28px 32px;
+  overflow-x: auto;
+}
+
+/* ---- Daily report page --------------------------------------------------- */
+
+.report-page {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  max-width: 1240px;
+  font-size: 18px;
+}
+
+.report-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 36px 40px;
+  box-shadow: 0 10px 30px -18px rgba(30, 42, 80, 0.25);
+}
+
+.report-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 27px;
+  font-weight: 700;
+  color: #1e3a68;
+  margin: 0 0 20px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid #eef1f6;
+}
+
+.profile-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 19px;
+  color: #333c4d;
+  margin-bottom: 26px;
+}
+
+.profile-label {
+  font-weight: 600;
+  color: #5b6472;
+}
+
+.report-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px 22px;
+}
+
+.report-form .form-span {
+  grid-column: 1 / -1;
+}
+
+.textarea-plain {
+  min-height: 140px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.checkbox-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 17px;
+  color: #3f4759;
+}
+
+.report-page .field-label {
+  font-size: 18.5px;
+}
+
+.report-page .input-plain {
+  font-size: 20px;
+  padding: 16px 19px;
+}
+
+.report-page .btn-primary,
+.report-page .btn-secondary {
+  font-size: 20px;
+  padding: 17px 26px;
+}
+
+.checkbox-field input {
+  width: 19px;
+  height: 19px;
+}
+
+.report-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.btn-secondary {
+  padding: 16px 20px;
+  border: 1px solid #d7dbe6;
+  border-radius: 10px;
+  background: #fff;
+  color: #3f4759;
+  font-weight: 600;
+  font-size: 19px;
+  cursor: pointer;
+}
+
+.report-history-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 21px;
+  font-weight: 700;
+  color: #333c4d;
+  margin: 0 0 18px;
+}
+
+.report-history-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.report-history-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 20px 22px;
+  border: 1px solid #eef1f6;
+  border-radius: 12px;
+}
+
+.report-history-date {
+  font-weight: 700;
+  color: #1e3a68;
+  font-size: 19px;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.report-check-badge {
+  font-weight: 600;
+  font-size: 14px;
+  padding: 4px 12px;
+  border-radius: 999px;
+}
+
+.report-check-badge--checked {
+  background: #e6f6ec;
+  color: #1e7a3c;
+}
+
+.report-check-badge--pending {
+  background: #fdf1e8;
+  color: #b25a1f;
+}
+
+.teacher-role-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.teacher-role-badge {
+  font-weight: 600;
+  font-size: 14px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.teacher-role-badge--advisor {
+  background: #e8eefd;
+  color: #2952c8;
+}
+
+.teacher-role-badge--supervisor {
+  background: #f3e8fd;
+  color: #7a2fc8;
+}
+
+.report-history-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  font-size: 17.5px;
+  color: #5b6472;
+}
+
+.report-history-topic {
+  font-weight: 600;
+  font-size: 18px;
+  color: #1f2937;
+  margin: 2px 0 6px;
+}
+
+.supervision-topics-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.supervision-topic-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px;
+  background: #f7f8fb;
+  border-radius: 10px;
+}
+
+.supervision-topic-row .icon-button {
+  position: static;
+  transform: none;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.supervision-topic-row-fields {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.supervision-topic-list {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.supervision-topic-item+.supervision-topic-item {
+  border-top: 1px solid #e5e8ee;
+  padding-top: 10px;
+}
+
+.report-history-updated {
+  font-size: 15px;
+  color: #98a2b3;
+  margin-top: 4px;
+}
+
+.report-history-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.report-history-actions .icon-button {
+  position: static;
+  transform: none;
+  font-size: 21px;
+}
+
+/* ---- Student home dashboard ----------------------------------------------- */
+
+.progress-bar-track {
+  width: 100%;
+  height: 18px;
+  border-radius: 999px;
+  background: #eef1f6;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #2f5ba3, #1e3a68);
+  transition: width 0.3s ease;
+}
+
+.progress-bar-caption {
+  margin: 12px 0 0;
+  font-size: 17.5px;
+  color: #5b6472;
+}
+
+.home-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-top: 22px;
+}
+
+.home-stat-box {
+  background: #f4f6fa;
+  border-radius: 14px;
+  padding: 22px 20px;
+  text-align: center;
+}
+
+.home-stat-box--warning {
+  background: #fdf1e8;
+}
+
+.home-stat-value {
+  font-size: 38px;
+  font-weight: 700;
+  color: #1e3a68;
+  line-height: 1.2;
+}
+
+.home-stat-box--warning .home-stat-value {
+  color: #b25a1f;
+}
+
+.home-stat-label {
+  margin-top: 7px;
+  font-size: 16.5px;
+  color: #5b6472;
+}
+
+.home-missing-list {
+  margin-top: 20px;
+}
+
+.home-missing-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.home-missing-tag {
+  font-size: 15px;
+  color: #b25a1f;
+  background: #fdf1e8;
+  border-radius: 999px;
+  padding: 8px 14px;
+}
+
+@media (max-width: 720px) {
+  .home-stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---- Mentor student roster table ------------------------------------------ */
+
+.mentor-table-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.mentor-table-toolbar .report-history-title {
+  margin: 0;
+}
+
+.mentor-search-input {
+  max-width: 360px;
+}
+
+.mentor-table-wrap {
+  overflow-x: auto;
+}
+
+.mentor-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 18px;
+}
+
+.mentor-table th {
+  text-align: left;
+  font-size: 16px;
+  font-weight: 600;
+  color: #5b6472;
+  background: #f4f6fa;
+  padding: 14px 16px;
+  white-space: nowrap;
+}
+
+.mentor-table th:first-child {
+  border-radius: 10px 0 0 10px;
+}
+
+.mentor-table th:last-child {
+  border-radius: 0 10px 10px 0;
+}
+
+.mentor-table td {
+  padding: 18px 16px;
+  border-bottom: 1px solid #eef1f6;
+  color: #1f2937;
+}
+
+.mentor-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.mentor-table-empty {
+  text-align: center;
+  padding: 24px 0 4px;
+  font-size: 17px;
+}
+
+.mentor-table-row {
+  cursor: pointer;
+}
+
+.mentor-table-row:hover {
+  background: #f4f6fa;
+}
+
+.mentor-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 19px;
+  font-weight: 600;
+}
+
+.mentor-report-desc {
+  margin: 6px 0;
+  font-size: 17.5px;
+  color: #333c4d;
+  max-width: 68ch;
+}
+
+.mentor-report-desc--clamped {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.mentor-report-desc-full {
+  margin: 12px 0 4px;
+  font-size: 21px;
+  color: #1f2937;
+  white-space: pre-wrap;
+  line-height: 1.7;
+}
+
+.mentor-report-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.mentor-report-actions .btn-primary,
+.mentor-report-actions .btn-secondary {
+  white-space: nowrap;
+}
+
+/* ---- Mentor report detail page: a bit larger than the base report-page ---- */
+
+.mentor-detail-page .report-title {
+  font-size: 29px;
+}
+
+.mentor-detail-page .mentor-report-desc {
+  font-size: 19px;
+}
+
+.mentor-detail-page .report-history-date {
+  font-size: 20px;
+}
+
+.mentor-detail-page .report-history-item {
+  padding: 24px 26px;
+}
+
+.mentor-detail-page .report-history-meta {
+  font-size: 17.5px;
+}
+
+.mentor-detail-page .report-history-topic {
+  font-size: 19px;
+}
+
+/* ---- Modal ---------------------------------------------------------------- */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 26, 46, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 100;
+}
+
+.modal-card {
+  background: #fff;
+  border-radius: 18px;
+  width: 100%;
+  max-width: 1060px;
+  max-height: 92vh;
+  overflow-y: auto;
+  padding: 52px 56px;
+  box-shadow: 0 20px 50px -20px rgba(20, 26, 46, 0.4);
+}
+
+.modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #eef1f6;
+}
+
+.modal-header .report-history-title {
+  margin: 0;
+  font-size: 28px;
+}
+
+.modal-close {
+  position: static;
+}
+
+.modal-body .field-label {
+  font-size: 19px;
+}
+
+.modal-meta-grid {
+  margin-bottom: 0;
+  margin-top: 24px;
+  gap: 20px 28px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  font-size: 19px;
+}
+
+.modal-footer {
+  margin-top: 30px;
+  padding-top: 22px;
+  border-top: 1px solid #eef1f6;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ---- Mentor attendance page (เช็คชื่อนักศึกษา) ------------------------------ */
+
+.mentor-attendance-title {
+  margin: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.mentor-date-input {
+  max-width: 220px;
+}
+
+.mentor-attendance-toolbar {
+  margin-top: 18px;
+}
+
+.mentor-attendance-student {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.mentor-attendance-code {
+  font-size: 14.5px;
+  color: #8892a6;
+  margin-top: 2px;
+}
+
+.attendance-select {
+  min-width: 160px;
+  font-weight: 600;
+}
+
+/* ---- Mentor evaluation page (ประเมินผลนักศึกษา) ----------------------------- */
+
+.eval-static-value {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+  padding: 6px 0;
+}
+
+.eval-attendance-grid {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+@media (max-width: 900px) {
+  .eval-attendance-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.eval-table-wrap {
+  overflow-x: auto;
+}
+
+.eval-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 17px;
+}
+
+.eval-table th,
+.eval-table td {
+  border: 1px solid #eef1f6;
+  padding: 12px 14px;
+  text-align: center;
+}
+
+.eval-table th {
+  background: #f4f6fa;
+  color: #5b6472;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.eval-table-topic {
+  text-align: left !important;
+  min-width: 320px;
+  color: #333c4d;
+}
+
+.eval-table-radio-cell input {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.eval-total-label {
+  font-weight: 700;
+  color: #1e3a68;
+  font-size: 18px;
+}
+
+.eval-total-value {
+  font-weight: 700;
+  color: #1e3a68;
+  font-size: 20px;
+  background: #f4f6fa;
+}
+
+/* ---- Printable documents (ดาวน์โหลดเอกสาร) ---------------------------------- */
+
+.leave-print-doc {
+  font-size: 18px;
+  line-height: 2.1;
+  color: #1a1a1a;
+}
+
+.leave-doc-title {
+  text-align: center;
+  font-weight: 700;
+  font-size: 21px;
+  margin: 0 0 22px;
+}
+
+.leave-doc-right {
+  text-align: right;
+  margin: 0;
+}
+
+.leave-doc-indent {
+  text-indent: 2.5em;
+  margin: 14px 0 0;
+}
+
+.leave-doc-signature {
+  text-align: center;
+  margin: 0;
+}
+
+.leave-doc-blank {
+  display: inline-block;
+  min-width: 70px;
+  padding: 0 4px;
+  text-align: center;
+  border-bottom: 1px dotted #444;
+}
+
+@media print {
+
+  .app-topbar,
+  .sidebar,
+  .no-print {
+    display: none !important;
+  }
+
+  .app-body,
+  .app-shell,
+  .app-content,
+  .report-page {
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: none !important;
+  }
+
+  .report-page>.report-card {
+    display: none;
+  }
+
+  .report-page>.leave-print-doc {
+    display: block !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+  }
+
+  @page {
+    size: A4;
+    margin: 20mm 18mm;
+  }
+}
