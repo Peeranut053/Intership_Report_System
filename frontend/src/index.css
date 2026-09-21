@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 :root {
   --text: #6b6375;
   --text-h: #08060d;
@@ -15,19 +17,11 @@
   --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
   --mono: ui-monospace, Consolas, monospace;
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
+  font-family: var(--sans);
   color-scheme: light;
-  color: var(--text);
-  background: var(--bg);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
+  @apply text-[18px] leading-[145%] tracking-[0.18px] text-(--text) bg-(--bg) antialiased max-lg:text-base;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -46,96 +40,58 @@
   }
 
   #social .button-icon {
-    filter: invert(1) brightness(2);
+    @apply invert brightness-200;
   }
 }
 
 #root {
-  width: 100%;
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
+  @apply w-full min-h-svh flex flex-col box-border;
 }
 
 /* ---- Global top bar ---------------------------------------------------- */
 
 .app-root {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-height: 100svh;
-  width: 100%;
+  @apply flex flex-col flex-1 min-h-svh w-full;
 }
 
 .app-topbar {
-  flex-shrink: 0;
-  background: #1c2b58;
-  color: #fff;
-  text-align: center;
-  font-weight: 700;
-  font-size: 24px;
-  letter-spacing: 0.3px;
-  padding: 22px 16px;
+  @apply shrink-0 bg-[#1c2b58] text-white text-center font-bold text-[24px] tracking-[0.3px] px-4 py-[22px] print:hidden!;
 }
 
 .app-body {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
+  @apply flex-1 flex flex-col min-h-0 print:block! print:m-0! print:p-0! print:max-w-none!;
 }
 
 body {
-  margin: 0;
+  @apply m-0;
 }
 
 h1,
 h2 {
   font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
+  @apply font-medium text-(--text-h);
 }
 
 h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
+  @apply text-[56px] tracking-[-1.68px] my-8 max-lg:text-[36px] max-lg:my-5;
 }
 
 h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
+  @apply text-[24px] leading-[118%] tracking-[-0.24px] mt-0 mb-2 max-lg:text-[20px];
 }
 
 p {
-  margin: 0;
+  @apply m-0;
 }
 
 code,
 .counter {
   font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
+  @apply inline-flex rounded text-(--text-h);
 }
 
 code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+  @apply text-[15px] leading-[135%] px-2 py-1 bg-(--code-bg);
 }
 
 /* ---- App shell ------------------------------------------------------- */
@@ -144,1051 +100,649 @@ code {
    above — this is a branded login/register screen, not general app chrome. */
 
 .page {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-height: 0;
-  background: #eef1f6;
+  @apply flex flex-col flex-1 min-h-0 bg-[#eef1f6];
 }
 
 .page-header {
-  padding: 0;
+  @apply p-0;
 }
 
 .page-main {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 32px 16px;
+  @apply flex-1 flex items-center justify-center px-4 py-8;
 }
 
 /* ---- Auth card (login/register/dashboard) ----------------------------- */
 
 .auth-shell {
-  width: 100%;
-  max-width: 480px;
-  text-align: left;
-  border-radius: 20px;
-  padding: 40px 36px;
-  background: #ffffff;
-  box-shadow: 0 20px 40px -12px rgba(30, 42, 80, 0.18);
+  @apply w-full max-w-[480px] text-left rounded-[20px] px-9 py-10 bg-white shadow-[0_20px_40px_-12px_rgba(30,42,80,0.18)];
 }
 
 .auth-shell--wide {
-  max-width: 720px;
+  @apply max-w-[720px];
 }
 
 .auth-title {
-  margin: 0 0 22px;
-  font-size: 24px;
-  line-height: 140%;
-  font-weight: 700;
-  text-align: center;
-  color: #1e3a68;
+  @apply mt-0 mb-[22px] text-[24px] leading-[140%] font-bold text-center text-[#1e3a68];
 }
 
 .auth-hint {
-  font-size: 17px;
-  color: #5b6472;
-  margin: 8px 0 0;
+  @apply text-[17px] text-[#5b6472] mt-2 mb-0;
 }
 
 /* ---- Role tabs --------------------------------------------------------- */
 
 .role-tabs {
-  display: flex;
-  gap: 4px;
-  padding: 4px;
-  margin-bottom: 20px;
-  background: #eef1f6;
-  border-radius: 12px;
+  @apply flex gap-1 p-1 mb-5 bg-[#eef1f6] rounded-xl;
 }
 
 .role-tab {
-  flex: 1;
-  padding: 13px 4px;
-  border: none;
-  border-radius: 9px;
-  background: transparent;
-  color: #8892a6;
   font: inherit;
-  font-size: 17px;
-  font-weight: 600;
-  cursor: pointer;
+  @apply flex-1 px-1 py-[13px] border-none rounded-[9px] bg-transparent text-[#8892a6] text-[17px] font-semibold cursor-pointer;
 }
 
 .role-tab--active {
-  background: #ffffff;
-  color: #1e3a68;
-  box-shadow: 0 1px 4px rgba(30, 42, 80, 0.15);
+  @apply bg-white text-[#1e3a68] shadow-[0_1px_4px_rgba(30,42,80,0.15)];
 }
 
 /* ---- Form / fields ------------------------------------------------------ */
 
 .form {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  @apply flex flex-col gap-4;
 }
 
 .form--grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 18px 20px;
+  @apply grid grid-cols-2 gap-x-5 gap-y-[18px];
 }
 
 .form--grid .form-span {
-  grid-column: 1 / -1;
+  @apply col-span-full;
 }
 
 .field {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
+  @apply flex flex-col gap-[7px];
 }
 
 .field-label {
-  font-size: 17px;
-  font-weight: 600;
-  color: #3f4759;
+  @apply text-[17px] font-semibold text-[#3f4759];
 }
 
 .input-plain {
-  width: 100%;
-  box-sizing: border-box;
   font: inherit;
-  font-size: 19px;
-  padding: 15px 17px;
-  border: none;
-  border-radius: 10px;
-  background: #eef1f6;
-  color: #1f2937;
+  @apply w-full box-border text-[19px] px-[17px] py-[15px] border-none rounded-[10px] bg-[#eef1f6] text-[#1f2937];
 }
 
 .input-plain::placeholder {
-  color: #98a2b3;
+  @apply text-[#98a2b3];
 }
 
 .input-plain:focus {
-  outline: 2px solid #1e3a68;
-  outline-offset: 1px;
+  @apply outline outline-2 outline-offset-1 outline-[#1e3a68];
 }
 
 .input-plain:disabled {
-  background: #e2e5eb;
-  color: #55606f;
-  cursor: not-allowed;
+  @apply bg-[#e2e5eb] text-[#55606f] cursor-not-allowed;
 }
 
 .form-success {
-  color: #1e7a3c;
-  font-size: 16px;
-  margin: 0;
+  @apply text-[#1e7a3c] text-base m-0;
 }
 
 .section-title {
-  margin-top: 24px;
+  @apply mt-6;
 }
 
 .input-with-icon {
-  position: relative;
+  @apply relative;
 }
 
 .input-with-icon .input-plain {
-  padding-right: 44px;
+  @apply pr-11;
 }
 
 .icon-button {
-  position: absolute;
-  top: 50%;
-  right: 10px;
-  transform: translateY(-50%);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  background: transparent;
-  color: #8892a6;
-  cursor: pointer;
-  padding: 4px;
+  @apply absolute top-1/2 right-[10px] -translate-y-1/2 inline-flex items-center justify-center border-none bg-transparent text-[#8892a6] cursor-pointer p-1;
 }
 
 /* Text-label variant (e.g. "แก้ไข"/"ลบ") rather than a single icon glyph —
    overrides the larger icon font-size some contexts set. */
 .icon-button--text {
   font: inherit;
-  font-size: 14px;
-  font-weight: 600;
-  padding: 6px 10px;
-  border-radius: 6px;
-  background: #eef1f6;
-  color: #47536b;
+  @apply text-[14px] font-semibold px-[10px] py-[6px] rounded-md bg-[#eef1f6] text-[#47536b];
 }
 
 .icon-button--text:hover {
-  background: #e2e6ee;
+  @apply bg-[#e2e6ee];
 }
 
 /* ---- Buttons / links ----------------------------------------------------- */
 
 .btn-primary {
-  margin-top: 4px;
-  padding: 16px 20px;
-  border: none;
-  border-radius: 10px;
-  background: #1e3a68;
-  color: #fff;
-  font-weight: 700;
-  font-size: 19px;
-  cursor: pointer;
+  @apply mt-1 px-5 py-4 border-none rounded-[10px] bg-[#1e3a68] text-white font-bold text-[19px] cursor-pointer;
 }
 
 .btn-primary:hover {
-  background: #172c50;
+  @apply bg-[#172c50];
 }
 
 .btn-primary:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+  @apply opacity-60 cursor-not-allowed;
 }
 
 .form-error {
-  color: #d43a52;
-  font-size: 16px;
-  margin: 0;
+  @apply text-[#d43a52] text-base m-0;
 }
 
 .form-error--span {
-  grid-column: 1 / -1;
+  @apply col-span-full;
 }
 
 .switch-link {
-  margin-top: 18px;
-  font-size: 17px;
-  text-align: center;
+  @apply mt-[18px] text-[17px] text-center;
 }
 
 .forgot-link {
-  margin: -4px 0 0;
-  font-size: 16px;
-  text-align: right;
+  @apply -mt-1 mb-0 text-base text-right;
 }
 
 .link-button {
-  background: none;
-  border: none;
-  color: #4c63a8;
-  cursor: pointer;
-  padding: 0;
   font: inherit;
-  font-size: 16px;
-  text-decoration: none;
+  @apply bg-none border-none text-[#4c63a8] cursor-pointer p-0 text-base no-underline;
 }
 
 .link-button:hover {
-  text-decoration: underline;
+  @apply underline;
 }
 
 /* ---- Student app shell (sidebar layout) --------------------------------- */
 
 .app-shell {
-  display: flex;
-  flex: 1;
-  min-height: 0;
-  width: 100%;
-  background: #eef1f6;
+  @apply flex flex-1 min-h-0 w-full bg-[#eef1f6] print:block! print:m-0! print:p-0! print:max-w-none!;
 }
 
 .sidebar {
-  width: 280px;
-  flex-shrink: 0;
-  background: #1c2b58;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 24px 0;
+  @apply w-[280px] shrink-0 bg-[#1c2b58] flex flex-col justify-between py-6 px-0 print:hidden!;
 }
 
 .sidebar-user {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 0 24px 20px;
-  margin: 0 12px 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-  color: #fff;
-  font-size: 18px;
-  font-weight: 600;
+  @apply flex items-center gap-[10px] pt-0 px-6 pb-5 mt-0 mx-3 mb-3 border-b border-[rgba(255,255,255,0.12)] text-white text-[18px] font-semibold;
 }
 
 .sidebar-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  padding: 0 12px;
+  @apply flex flex-col gap-[3px] px-3;
 }
 
 .sidebar-link {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 14px 16px;
-  border: none;
-  border-radius: 10px;
-  background: transparent;
-  color: #b9c2de;
   font: inherit;
-  font-size: 18px;
-  text-align: left;
-  cursor: pointer;
+  @apply flex items-center gap-[10px] px-4 py-[14px] border-none rounded-[10px] bg-transparent text-[#b9c2de] text-[18px] text-left cursor-pointer;
 }
 
 .sidebar-link:hover {
-  background: rgba(255, 255, 255, 0.06);
-  color: #fff;
+  @apply bg-white/[0.06] text-white;
 }
 
 .sidebar-link--active {
-  background: #2c3d78;
-  color: #fff;
-  font-weight: 600;
+  @apply bg-[#2c3d78] text-white font-semibold;
 }
 
 .sidebar-logout {
-  margin: 0 12px;
-  color: #ff9d9d;
+  @apply mx-3 text-[#ff9d9d];
 }
 
 .sidebar-logout:hover {
-  background: rgba(255, 255, 255, 0.06);
-  color: #ffb3b3;
+  @apply bg-white/[0.06] text-[#ffb3b3];
 }
 
 .app-content {
-  flex: 1;
-  padding: 28px 32px;
-  overflow-x: auto;
+  @apply flex-1 px-8 py-7 overflow-x-auto print:block! print:m-0! print:p-0! print:max-w-none!;
 }
 
 /* ---- Daily report page --------------------------------------------------- */
 
 .report-page {
-  display: flex;
-  flex-direction: column;
-  gap: 26px;
-  max-width: 1240px;
-  font-size: 18px;
+  @apply flex flex-col gap-[26px] max-w-[1240px] text-[18px] print:block! print:m-0! print:p-0! print:max-w-none!;
+}
+
+.report-page > .report-card {
+  @apply print:hidden;
+}
+
+.report-page > .leave-print-doc {
+  @apply print:block! print:shadow-none! print:border-none! print:p-0!;
 }
 
 .report-card {
-  background: #fff;
-  border-radius: 16px;
-  padding: 36px 40px;
-  box-shadow: 0 10px 30px -18px rgba(30, 42, 80, 0.25);
+  @apply bg-white rounded-2xl px-10 py-9 shadow-[0_10px_30px_-18px_rgba(30,42,80,0.25)];
 }
 
 .report-title {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 27px;
-  font-weight: 700;
-  color: #1e3a68;
-  margin: 0 0 20px;
-  padding-bottom: 18px;
-  border-bottom: 1px solid #eef1f6;
+  @apply flex items-center gap-[10px] text-[27px] font-bold text-[#1e3a68] mt-0 mb-5 pb-[18px] border-b border-[#eef1f6];
 }
 
 .profile-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  font-size: 19px;
-  color: #333c4d;
-  margin-bottom: 26px;
+  @apply flex flex-col gap-[10px] text-[19px] text-[#333c4d] mb-[26px];
 }
 
 .profile-label {
-  font-weight: 600;
-  color: #5b6472;
+  @apply font-semibold text-[#5b6472];
 }
 
 .report-form {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px 22px;
+  @apply grid grid-cols-2 gap-x-[22px] gap-y-5;
 }
 
 .report-form .form-span {
-  grid-column: 1 / -1;
+  @apply col-span-full;
 }
 
 .textarea-plain {
-  min-height: 140px;
-  resize: vertical;
   font-family: inherit;
+  @apply min-h-[140px] resize-y;
 }
 
 .checkbox-field {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 17px;
-  color: #3f4759;
+  @apply flex items-center gap-2 text-[17px] text-[#3f4759];
 }
 
 .report-page .field-label {
-  font-size: 18.5px;
+  @apply text-[18.5px];
 }
 
 .report-page .input-plain {
-  font-size: 20px;
-  padding: 16px 19px;
+  @apply text-[20px] px-[19px] py-4;
 }
 
 .report-page .btn-primary,
 .report-page .btn-secondary {
-  font-size: 20px;
-  padding: 17px 26px;
+  @apply text-[20px] px-[26px] py-[17px];
 }
 
 .checkbox-field input {
-  width: 19px;
-  height: 19px;
+  @apply w-[19px] h-[19px];
 }
 
 .report-form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
+  @apply flex justify-end gap-3;
 }
 
 .btn-secondary {
-  padding: 16px 20px;
-  border: 1px solid #d7dbe6;
-  border-radius: 10px;
-  background: #fff;
-  color: #3f4759;
-  font-weight: 600;
-  font-size: 19px;
-  cursor: pointer;
+  @apply px-5 py-4 border border-[#d7dbe6] rounded-[10px] bg-white text-[#3f4759] font-semibold text-[19px] cursor-pointer;
 }
 
 .report-history-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 21px;
-  font-weight: 700;
-  color: #333c4d;
-  margin: 0 0 18px;
+  @apply flex items-center gap-2 text-[21px] font-bold text-[#333c4d] mt-0 mb-[18px];
 }
 
 .report-history-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+  @apply list-none m-0 p-0 flex flex-col gap-[14px];
 }
 
 .report-history-item {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 14px;
-  padding: 20px 22px;
-  border: 1px solid #eef1f6;
-  border-radius: 12px;
+  @apply flex items-start justify-between gap-[14px] px-[22px] py-5 border border-[#eef1f6] rounded-xl;
 }
 
 .report-history-date {
-  font-weight: 700;
-  color: #1e3a68;
-  font-size: 19px;
-  margin-bottom: 4px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
+  @apply font-bold text-[#1e3a68] text-[19px] mb-1 flex items-center gap-[10px] flex-wrap;
 }
 
 .report-check-badge {
-  font-weight: 600;
-  font-size: 14px;
-  padding: 4px 12px;
-  border-radius: 999px;
+  @apply font-semibold text-[14px] px-3 py-1 rounded-full;
 }
 
 .report-check-badge--checked {
-  background: #e6f6ec;
-  color: #1e7a3c;
+  @apply bg-[#e6f6ec] text-[#1e7a3c];
 }
 
 .report-check-badge--pending {
-  background: #fdf1e8;
-  color: #b25a1f;
+  @apply bg-[#fdf1e8] text-[#b25a1f];
 }
 
 .teacher-role-badges {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+  @apply flex flex-wrap gap-[6px];
 }
 
 .teacher-role-badge {
-  font-weight: 600;
-  font-size: 14px;
-  padding: 4px 12px;
-  border-radius: 999px;
-  white-space: nowrap;
+  @apply font-semibold text-[14px] px-3 py-1 rounded-full whitespace-nowrap;
 }
 
 .teacher-role-badge--advisor {
-  background: #e8eefd;
-  color: #2952c8;
+  @apply bg-[#e8eefd] text-[#2952c8];
 }
 
 .teacher-role-badge--supervisor {
-  background: #f3e8fd;
-  color: #7a2fc8;
+  @apply bg-[#f3e8fd] text-[#7a2fc8];
 }
 
 .report-history-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px;
-  font-size: 17.5px;
-  color: #5b6472;
+  @apply flex flex-wrap gap-[14px] text-[17.5px] text-[#5b6472];
 }
 
 .report-history-topic {
-  font-weight: 600;
-  font-size: 18px;
-  color: #1f2937;
-  margin: 2px 0 6px;
+  @apply font-semibold text-[18px] text-[#1f2937] mt-[2px] mb-[6px];
 }
 
 .supervision-topics-editor {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 6px;
+  @apply flex flex-col gap-3 mt-[6px];
 }
 
 .supervision-topic-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 14px;
-  background: #f7f8fb;
-  border-radius: 10px;
+  @apply flex items-start gap-[10px] p-[14px] bg-[#f7f8fb] rounded-[10px];
 }
 
 .supervision-topic-row .icon-button {
-  position: static;
-  transform: none;
-  font-size: 22px;
-  flex-shrink: 0;
+  @apply static translate-y-0 text-[22px] shrink-0;
 }
 
 .supervision-topic-row-fields {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  @apply flex-1 flex flex-col gap-2;
 }
 
 .supervision-topic-list {
-  list-style: none;
-  margin: 6px 0 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  @apply list-none mt-[6px] mb-0 p-0 flex flex-col gap-[10px];
 }
 
 .supervision-topic-item+.supervision-topic-item {
-  border-top: 1px solid #e5e8ee;
-  padding-top: 10px;
+  @apply border-t border-[#e5e8ee] pt-[10px];
 }
 
 .report-history-updated {
-  font-size: 15px;
-  color: #98a2b3;
-  margin-top: 4px;
+  @apply text-[15px] text-[#98a2b3] mt-1;
 }
 
 .report-history-actions {
-  display: flex;
-  gap: 6px;
-  flex-shrink: 0;
+  @apply flex gap-[6px] shrink-0;
 }
 
 .report-history-actions .icon-button {
-  position: static;
-  transform: none;
-  font-size: 21px;
+  @apply static translate-y-0 text-[21px];
 }
 
 /* ---- Student home dashboard ----------------------------------------------- */
 
 .progress-bar-track {
-  width: 100%;
-  height: 18px;
-  border-radius: 999px;
-  background: #eef1f6;
-  overflow: hidden;
+  @apply w-full h-[18px] rounded-full bg-[#eef1f6] overflow-hidden;
 }
 
 .progress-bar-fill {
-  height: 100%;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #2f5ba3, #1e3a68);
   transition: width 0.3s ease;
+  @apply h-full rounded-full bg-[linear-gradient(90deg,#2f5ba3,#1e3a68)];
 }
 
 .progress-bar-caption {
-  margin: 12px 0 0;
-  font-size: 17.5px;
-  color: #5b6472;
+  @apply mt-3 mb-0 text-[17.5px] text-[#5b6472];
 }
 
 .home-stats-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
-  margin-top: 22px;
+  @apply grid grid-cols-3 gap-[18px] mt-[22px] max-[720px]:grid-cols-1;
 }
 
 .home-stat-box {
-  background: #f4f6fa;
-  border-radius: 14px;
-  padding: 22px 20px;
-  text-align: center;
+  @apply bg-[#f4f6fa] rounded-[14px] px-5 py-[22px] text-center;
 }
 
 .home-stat-box--warning {
-  background: #fdf1e8;
+  @apply bg-[#fdf1e8];
 }
 
 .home-stat-value {
-  font-size: 38px;
-  font-weight: 700;
-  color: #1e3a68;
-  line-height: 1.2;
+  @apply text-[38px] font-bold text-[#1e3a68] leading-[1.2];
 }
 
 .home-stat-box--warning .home-stat-value {
-  color: #b25a1f;
+  @apply text-[#b25a1f];
 }
 
 .home-stat-label {
-  margin-top: 7px;
-  font-size: 16.5px;
-  color: #5b6472;
+  @apply mt-[7px] text-[16.5px] text-[#5b6472];
 }
 
 .home-missing-list {
-  margin-top: 20px;
+  @apply mt-5;
 }
 
 .home-missing-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 8px;
+  @apply flex flex-wrap gap-2 mt-2;
 }
 
 .home-missing-tag {
-  font-size: 15px;
-  color: #b25a1f;
-  background: #fdf1e8;
-  border-radius: 999px;
-  padding: 8px 14px;
-}
-
-@media (max-width: 720px) {
-  .home-stats-grid {
-    grid-template-columns: 1fr;
-  }
+  @apply text-[15px] text-[#b25a1f] bg-[#fdf1e8] rounded-full px-[14px] py-2;
 }
 
 /* ---- Mentor student roster table ------------------------------------------ */
 
 .mentor-table-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
-  margin-bottom: 18px;
+  @apply flex items-center justify-between gap-4 flex-wrap mb-[18px];
 }
 
 .mentor-table-toolbar .report-history-title {
-  margin: 0;
+  @apply m-0;
 }
 
 .mentor-search-input {
-  max-width: 360px;
+  @apply max-w-[360px];
 }
 
 .mentor-table-wrap {
-  overflow-x: auto;
+  @apply overflow-x-auto;
 }
 
 .mentor-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 18px;
+  @apply w-full border-collapse text-[18px];
 }
 
 .mentor-table th {
-  text-align: left;
-  font-size: 16px;
-  font-weight: 600;
-  color: #5b6472;
-  background: #f4f6fa;
-  padding: 14px 16px;
-  white-space: nowrap;
+  @apply text-left text-[16px] font-semibold text-[#5b6472] bg-[#f4f6fa] px-4 py-[14px] whitespace-nowrap;
 }
 
 .mentor-table th:first-child {
-  border-radius: 10px 0 0 10px;
+  @apply rounded-l-[10px];
 }
 
 .mentor-table th:last-child {
-  border-radius: 0 10px 10px 0;
+  @apply rounded-r-[10px];
 }
 
 .mentor-table td {
-  padding: 18px 16px;
-  border-bottom: 1px solid #eef1f6;
-  color: #1f2937;
+  @apply px-4 py-[18px] border-b border-[#eef1f6] text-[#1f2937];
 }
 
 .mentor-table tbody tr:last-child td {
-  border-bottom: none;
+  @apply border-b-0;
 }
 
 .mentor-table-empty {
-  text-align: center;
-  padding: 24px 0 4px;
-  font-size: 17px;
+  @apply text-center pt-6 px-0 pb-1 text-[17px];
 }
 
 .mentor-table-row {
-  cursor: pointer;
+  @apply cursor-pointer;
 }
 
 .mentor-table-row:hover {
-  background: #f4f6fa;
+  @apply bg-[#f4f6fa];
 }
 
 .mentor-back-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 19px;
-  font-weight: 600;
+  @apply inline-flex items-center gap-[6px] text-[19px] font-semibold;
 }
 
 .mentor-report-desc {
-  margin: 6px 0;
-  font-size: 17.5px;
-  color: #333c4d;
-  max-width: 68ch;
+  @apply my-[6px] text-[17.5px] text-[#333c4d] max-w-[68ch];
 }
 
 .mentor-report-desc--clamped {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  @apply line-clamp-2;
 }
 
 .mentor-report-desc-full {
-  margin: 12px 0 4px;
-  font-size: 21px;
-  color: #1f2937;
-  white-space: pre-wrap;
-  line-height: 1.7;
+  @apply mt-3 mb-1 text-[21px] text-[#1f2937] whitespace-pre-wrap leading-[1.7];
 }
 
 .mentor-report-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  align-items: stretch;
+  @apply flex flex-col gap-[10px] items-stretch;
 }
 
 .mentor-report-actions .btn-primary,
 .mentor-report-actions .btn-secondary {
-  white-space: nowrap;
+  @apply whitespace-nowrap;
 }
 
 /* ---- Mentor report detail page: a bit larger than the base report-page ---- */
 
 .mentor-detail-page .report-title {
-  font-size: 29px;
+  @apply text-[29px];
 }
 
 .mentor-detail-page .mentor-report-desc {
-  font-size: 19px;
+  @apply text-[19px];
 }
 
 .mentor-detail-page .report-history-date {
-  font-size: 20px;
+  @apply text-[20px];
 }
 
 .mentor-detail-page .report-history-item {
-  padding: 24px 26px;
+  @apply px-[26px] py-6;
 }
 
 .mentor-detail-page .report-history-meta {
-  font-size: 17.5px;
+  @apply text-[17.5px];
 }
 
 .mentor-detail-page .report-history-topic {
-  font-size: 19px;
+  @apply text-[19px];
 }
 
 /* ---- Modal ---------------------------------------------------------------- */
 
 .modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(20, 26, 46, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  z-index: 100;
+  @apply fixed inset-0 bg-[rgba(20,26,46,0.5)] flex items-center justify-center p-5 z-[100];
 }
 
 .modal-card {
-  background: #fff;
-  border-radius: 18px;
-  width: 100%;
-  max-width: 1060px;
-  max-height: 92vh;
-  overflow-y: auto;
-  padding: 52px 56px;
-  box-shadow: 0 20px 50px -20px rgba(20, 26, 46, 0.4);
+  @apply bg-white rounded-[18px] w-full max-w-[1060px] max-h-[92vh] overflow-y-auto px-14 py-[52px] shadow-[0_20px_50px_-20px_rgba(20,26,46,0.4)];
 }
 
 .modal-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 10px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid #eef1f6;
+  @apply flex items-start justify-between gap-3 mb-[10px] pb-5 border-b border-[#eef1f6];
 }
 
 .modal-header .report-history-title {
-  margin: 0;
-  font-size: 28px;
+  @apply m-0 text-[28px];
 }
 
 .modal-close {
-  position: static;
+  @apply static;
 }
 
 .modal-body .field-label {
-  font-size: 19px;
+  @apply text-[19px];
 }
 
 .modal-meta-grid {
-  margin-bottom: 0;
-  margin-top: 24px;
-  gap: 20px 28px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  font-size: 19px;
+  @apply mb-0 mt-6 gap-x-7 gap-y-5 grid grid-cols-2 text-[19px];
 }
 
 .modal-footer {
-  margin-top: 30px;
-  padding-top: 22px;
-  border-top: 1px solid #eef1f6;
-  display: flex;
-  justify-content: flex-end;
+  @apply mt-[30px] pt-[22px] border-t border-[#eef1f6] flex justify-end;
 }
 
 /* ---- Mentor attendance page (เช็คชื่อนักศึกษา) ------------------------------ */
 
 .mentor-attendance-title {
-  margin: 0;
-  padding-bottom: 0;
-  border-bottom: none;
+  @apply m-0 pb-0 border-b-0;
 }
 
 .mentor-date-input {
-  max-width: 220px;
+  @apply max-w-[220px];
 }
 
 .mentor-attendance-toolbar {
-  margin-top: 18px;
+  @apply mt-[18px];
 }
 
 .mentor-attendance-student {
-  font-weight: 600;
-  color: #1f2937;
+  @apply font-semibold text-[#1f2937];
 }
 
 .mentor-attendance-code {
-  font-size: 14.5px;
-  color: #8892a6;
-  margin-top: 2px;
+  @apply text-[14.5px] text-[#8892a6] mt-[2px];
 }
 
 .attendance-select {
-  min-width: 160px;
-  font-weight: 600;
+  @apply min-w-[160px] font-semibold;
 }
 
 /* ---- Mentor evaluation page (ประเมินผลนักศึกษา) ----------------------------- */
 
 .eval-static-value {
-  font-size: 18px;
-  font-weight: 600;
-  color: #1f2937;
-  padding: 6px 0;
+  @apply text-[18px] font-semibold text-[#1f2937] py-[6px];
 }
 
 .eval-attendance-grid {
-  grid-template-columns: repeat(4, 1fr);
-}
-
-@media (max-width: 900px) {
-  .eval-attendance-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  @apply grid-cols-4 max-[900px]:grid-cols-2;
 }
 
 .eval-table-wrap {
-  overflow-x: auto;
+  @apply overflow-x-auto;
 }
 
 .eval-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 17px;
+  @apply w-full border-collapse text-[17px];
 }
 
 .eval-table th,
 .eval-table td {
-  border: 1px solid #eef1f6;
-  padding: 12px 14px;
-  text-align: center;
+  @apply border border-[#eef1f6] px-[14px] py-3 text-center;
 }
 
 .eval-table th {
-  background: #f4f6fa;
-  color: #5b6472;
-  font-size: 15px;
-  font-weight: 700;
+  @apply bg-[#f4f6fa] text-[#5b6472] text-[15px] font-bold;
 }
 
 .eval-table-topic {
-  text-align: left !important;
-  min-width: 320px;
-  color: #333c4d;
+  @apply text-left! min-w-[320px] text-[#333c4d];
 }
 
 .eval-table-radio-cell input {
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
+  @apply w-5 h-5 cursor-pointer;
 }
 
 .eval-total-label {
-  font-weight: 700;
-  color: #1e3a68;
-  font-size: 18px;
+  @apply font-bold text-[#1e3a68] text-[18px];
 }
 
 .eval-total-value {
-  font-weight: 700;
-  color: #1e3a68;
-  font-size: 20px;
-  background: #f4f6fa;
+  @apply font-bold text-[#1e3a68] text-[20px] bg-[#f4f6fa];
 }
 
 /* ---- Printable documents (ดาวน์โหลดเอกสาร) ---------------------------------- */
 
 .leave-print-doc {
-  font-size: 18px;
-  line-height: 2.1;
-  color: #1a1a1a;
+  @apply text-[18px] leading-[2.1] text-[#1a1a1a];
 }
 
 .leave-doc-title {
-  text-align: center;
-  font-weight: 700;
-  font-size: 21px;
-  margin: 0 0 22px;
+  @apply text-center font-bold text-[21px] mt-0 mb-[22px];
 }
 
 .leave-doc-right {
-  text-align: right;
-  margin: 0;
+  @apply text-right m-0;
 }
 
 .leave-doc-indent {
   text-indent: 2.5em;
-  margin: 14px 0 0;
+  @apply mt-[14px] mb-0;
 }
 
 .leave-doc-signature {
-  text-align: center;
-  margin: 0;
+  @apply text-center m-0;
 }
 
 .leave-doc-blank {
-  display: inline-block;
-  min-width: 70px;
-  padding: 0 4px;
-  text-align: center;
-  border-bottom: 1px dotted #444;
+  @apply inline-block min-w-[70px] px-1 py-0 text-center border-b border-dotted border-[#444];
 }
 
-@media print {
-
-  .app-topbar,
-  .sidebar,
-  .no-print {
-    display: none !important;
-  }
-
-  .app-body,
-  .app-shell,
-  .app-content,
-  .report-page {
-    display: block !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    max-width: none !important;
-  }
-
-  .report-page>.report-card {
-    display: none;
-  }
-
-  .report-page>.leave-print-doc {
-    display: block !important;
-    box-shadow: none !important;
-    border: none !important;
-    padding: 0 !important;
-  }
-
-  @page {
-    size: A4;
-    margin: 20mm 18mm;
-  }
+@page {
+  size: A4;
+  margin: 20mm 18mm;
 }
