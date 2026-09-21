@@ -1,3 +1,6 @@
+# Database scripts — kept local only, not pushed to the repo
+database/
+
 # Dependencies
 node_modules/
 
